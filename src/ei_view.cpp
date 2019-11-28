@@ -1,30 +1,73 @@
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4275)
 #include "Ogre.h"
 #include "OgreApplicationContext.h"
+#include "OgreCameraMan.h"
 
 class MyTestApp : public OgreBites::ApplicationContext, public OgreBites::InputListener
 {
 public:
     MyTestApp();
     void setup();
-    bool keyPressed(const OgreBites::KeyboardEvent& evt);
+	virtual void 	shutdown()
+	{
+		OgreBites::ApplicationContext::shutdown();
+
+		delete mCameraMan;
+	}
+
+	virtual void frameRendered(const Ogre::FrameEvent& evt)
+	{
+		mCameraMan->frameRendered(evt);   // if dialog isn't up, then update the camera
+	}
+	virtual bool keyPressed(const OgreBites::KeyboardEvent& evt)
+	{
+		if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+		{
+			getRoot()->queueEndRendering();
+		}
+		mCameraMan->keyPressed(evt);
+		return true;
+	}
+
+	virtual bool keyReleased(const OgreBites::KeyboardEvent& evt)
+	{
+		mCameraMan->keyReleased(evt);
+
+		return true;
+	}
+
+	virtual bool mouseMoved(const OgreBites::MouseMotionEvent& evt)
+	{
+		mCameraMan->mouseMoved(evt);
+		return true;
+	}
+	virtual bool mousePressed(const OgreBites::MouseButtonEvent& evt)
+	{
+		mCameraMan->mousePressed(evt);
+		return true;
+	}
+
+	virtual bool mouseReleased(const OgreBites::MouseButtonEvent& evt)
+	{
+		mCameraMan->mouseReleased(evt);
+		return true;
+	}
+	virtual bool mouseWheelRolled(const OgreBites::MouseWheelEvent& evt) {
+		mCameraMan->mouseWheelRolled(evt);
+		return true;
+	}
+protected:
+	OgreBites::CameraMan* mCameraMan;           // basic camera controller
 };
 
 //! [constructor]
 MyTestApp::MyTestApp() : OgreBites::ApplicationContext("OgreTutorialApp")
 {
+	mCameraMan = 0;
 }
 //! [constructor]
 
-//! [key_handler]
-bool MyTestApp::keyPressed(const OgreBites::KeyboardEvent& evt)
-{
-    if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
-    {
-        getRoot()->queueEndRendering();
-    }
-    return true;
-}
-//! [key_handler]
 
 //! [setup]
 void MyTestApp::setup(void)
@@ -67,6 +110,8 @@ void MyTestApp::setup(void)
     Ogre::Entity* ent = scnMgr->createEntity("Sinbad.mesh");
     Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
     node->attachObject(ent);
+	mCameraMan = new OgreBites::CameraMan(camNode);   // create a default camera controller
+	mCameraMan->setStyle(OgreBites::CS_FREELOOK);
 }
 //! [setup]
 
