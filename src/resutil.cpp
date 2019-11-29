@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <algorithm>
+#include <cctype>
+#include <clocale>
 
 using namespace std;
 namespace evil_islands {
@@ -72,10 +75,18 @@ namespace evil_islands {
         file_info_s* finfo = new file_info_s[header_.table_size];
 
         infile_.read((char*)finfo, header_.table_size * sizeof(file_info_s));
-
         char* names= new char[ header_.names_size];
-        
+        infile_.read(names, header_.names_size);
 
+        for( int i= 0; i < header_.table_size; i++)
+        {
+            
+            memcpy( &files_[i].info, finfo[i], sizeof(file_info_s) );
+            std::transform(names + finfo[i].name_offset, names + finfo[i].name_offset + finfo[i].name_length, files_[i].name.begin(), tolower);
+            std::cout << files_[i].name << endl;
+        }
+        delete[] names;
+        delete[] finfo;
     }
     ResArchive::~ResArchive()
     {
