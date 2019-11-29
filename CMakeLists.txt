@@ -17,3 +17,6 @@ add_executable(ei_view src/ei_view.cpp)
 # this also sets the includes and pulls third party dependencies
 target_link_libraries(ei_view OgreBites OgreRTShaderSystem)
 # ${OGRE_LIBRARIES}
+
+# add the source files as usual
+add_executable(resutil src/resutil.cpp)
