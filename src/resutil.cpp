@@ -14,11 +14,12 @@
 using namespace std;
 namespace evil_islands {
     typedef std::vector<uint8_t> MemData;
-    typedef std::shared_ptr<memdata_t> PMemData;
+    typedef std::shared_ptr<MemData> PMemData;
 
     class ResArchive
     {
         private:
+#pragma pack(push,1)
             struct header_s
             {
                 std::uint32_t magic; // 3C E2 9C 01
@@ -35,13 +36,18 @@ namespace evil_islands {
                 std::uint32_t   file_size;
                 std::uint32_t   file_offset;
 
-                time_t last_change_time; // 4 байтовое время Unix
+                __time32_t last_change_time; // 4 байтовое время Unix
 
                 std::uint16_t   name_length;
                 std::uint32_t   name_offset; // смещение в массиве `names`
             };
+#pragma pack(pop)
             struct file_info_name_s {
-                struct file_info_s info;
+                std::uint32_t   next_index;
+                std::uint32_t   file_size;
+                std::uint32_t   file_offset;
+                time_t last_change_time; // 4 байтовое время Unix
+
                 std::string name;
             };
             std::string filepath_;
@@ -69,6 +75,10 @@ namespace evil_islands {
             infile_.close();
             return;
         }
+            std::cout << "magic in "<< filepath << " ";
+    cout << setw(8) << header_.table_size << " " ;
+    cout << setw(8) << std::hex << sizeof( struct file_info_s )<< " " ;
+    cout << setw(8) << std::hex << header_.table_offset << std::dec<< endl ;
 
         infile_.seekg( header_.table_offset);
         files_.resize(header_.table_size);
@@ -78,12 +88,20 @@ namespace evil_islands {
         char* names= new char[ header_.names_size];
         infile_.read(names, header_.names_size);
 
-        for( int i= 0; i < header_.table_size; i++)
+        for( unsigned i= 0; i < header_.table_size; i++)
         {
+            files_[i].next_index = finfo[i].next_index;
+            files_[i].file_size = finfo[i].file_size;
+            files_[i].file_offset = finfo[i].file_offset;
+            files_[i].last_change_time = finfo[i].last_change_time;
+            files_[i].name = std::string( names + finfo[i].name_offset, finfo[i].name_length);
+            std::transform(files_[i].name.begin(), files_[i].name.end(),files_[i].name.begin(),std::tolower);
             
-            memcpy( &files_[i].info, finfo[i], sizeof(file_info_s) );
-            std::transform(names + finfo[i].name_offset, names + finfo[i].name_offset + finfo[i].name_length, files_[i].name.begin(), tolower);
-            std::cout << files_[i].name << endl;
+            cout << i << " " ;
+            cout << std::hex << setw(8) << files_[i].file_offset << " " ;
+            cout << setw(8) << finfo[i].name_offset << " ";
+            cout << setw(8) << finfo[i].name_length << " ";
+            cout << setw(8) << files_[i].file_size << std::dec <<" "<< files_[i].name << endl;
         }
         delete[] names;
         delete[] finfo;
@@ -92,6 +110,10 @@ namespace evil_islands {
     {
         if( infile_ ) infile_.close();
     }
+    PMemData LoadFile( const std::string& fname)
+    {
+        return nullptr;
+    }
 
 }
 int main(int argc, char *argv[])
@@ -99,6 +121,9 @@ int main(int argc, char *argv[])
     cout << "Test " ;
     cout << setw(8) << 5 << " " ;
     cout << setw(6) << 0x3E << endl;
+    if( argc < 2 ) return 0;
+    cout << argv[1] << endl;
+    evil_islands::ResArchive ra(argv[1]);
 
     return 0;
 }
