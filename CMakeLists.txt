@@ -21,3 +21,4 @@ target_link_libraries(ei_view OgreBites OgreRTShaderSystem)
 # add the source files as usual
 add_executable(resutil src/resutil.cpp)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+

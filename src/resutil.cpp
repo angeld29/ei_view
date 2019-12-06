@@ -36,7 +36,7 @@ namespace evil_islands {
                 std::uint32_t   file_size;
                 std::uint32_t   file_offset;
 
-                __time32_t last_change_time; // 4 байтовое время Unix
+                std::uint32_t   last_change_time; // 4 байтовое время Unix
 
                 std::uint16_t   name_length;
                 std::uint32_t   name_offset; // смещение в массиве `names`
@@ -46,7 +46,7 @@ namespace evil_islands {
                 std::uint32_t   next_index;
                 std::uint32_t   file_size;
                 std::uint32_t   file_offset;
-                time_t last_change_time; // 4 байтовое время Unix
+                std::uint32_t   last_change_time; // 4 байтовое время Unix
 
                 std::string name;
             };
@@ -95,7 +95,7 @@ namespace evil_islands {
             files_[i].file_offset = finfo[i].file_offset;
             files_[i].last_change_time = finfo[i].last_change_time;
             files_[i].name = std::string( names + finfo[i].name_offset, finfo[i].name_length);
-            std::transform(files_[i].name.begin(), files_[i].name.end(),files_[i].name.begin(),std::tolower);
+            //std::transform(files_[i].name.begin(), files_[i].name.end(),files_[i].name.begin(),std::tolower);
             
             cout << i << " " ;
             cout << std::hex << setw(8) << files_[i].file_offset << " " ;

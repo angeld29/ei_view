@@ -33,3 +33,4 @@
 bin/
 _build/
 Media/
+.vs/
