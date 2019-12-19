@@ -132,6 +132,13 @@ int main(int argc, char *argv[])
         cout <<  "-------------" << endl;
 
     }
+    if( argv[1][0] == 'x' && argc == 4 ){
+        cout <<  "Extract " << argv[3] << endl;
+        auto data = ra.LoadFile(argv[3]);
+        if( data ){
+            
+        }
+    }
 
     return 0;
 }
